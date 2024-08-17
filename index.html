@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Everything Factory</title>
+    <script src="scripts/script.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="everything-wrapper">
+        <div id="game">
+            <div id="control-panel">
+                <label for="scale">Scale</label>
+                <input type="range" name="scale" id="scale" min="-1" max="1" step="0.1">
+                <input type="checkbox" name="grid" id="grid" hidden>
+                <label for="grid">Grid</label>
+            </div>
+            <div id="play-area" class="canvas-wrapper">
+                <div>
+                    <canvas id="play-canvas"></canvas>
+                </div>
+                <button id="play-reset">Reset</button>
+                <button id="play-done">Done</button>
+            </div>
+            <div id="shape-select"></div>
+            <div id="target" class="canvas-wrapper">
+                <h2>Order</h2>
+                <div>
+                    <canvas id="target-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+        <div id="intro-overlay"></div>
+        <div id="level-completed-overlay" class="hidden">
+            <div class="popup">
+                <div class="result-wrapper">
+                    <span>
+                        Scanning
+                    </span>
+                    <span class="result-percentage" id="level-completed-scan">
+                        0%
+                    </span>
+                </div>
+                <canvas></canvas>
+                <div class="result-wrapper">
+                    <span>
+                        Result
+                    </span>
+                    <span class="result-percentage" id="level-completed-result">
+                        0%
+                    </span>
+                    <span id="result-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

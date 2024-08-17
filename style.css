@@ -1,0 +1,83 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#everything-wrapper {
+    height: 100vh;
+    /* width: 100vw; */
+    padding: 1%;
+    aspect-ratio: 16 / 9;
+    user-select: none;
+}
+
+#game {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    height: 100%;
+}
+
+canvas {
+    outline: 1px solid black;
+    image-rendering: pixelated;
+}
+
+#shape-select {
+    display: flex;
+    flex-direction: column;
+}
+
+#shape-select div.selected canvas {
+    background-color: rgba(0, 200, 0, 0.2);
+}
+
+#level-completed-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    place-items: center center;
+    text-align: center;
+}
+
+#level-completed-overlay .popup{
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+.result-wrapper {
+    width: 10rem;
+}
+
+.result-percentage {
+    display: block;
+    font-size: 2em;
+}
+
+.canvas-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.canvas-wrapper div {
+    flex-grow: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.popup {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+input[type="checkbox"]:checked + label {
+    background-color: green;
+}
