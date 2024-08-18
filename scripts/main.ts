@@ -19,6 +19,10 @@ namespace game {
     playCanvas.canvas.addEventListener("wheel", <EventListener>scaleWithMouse);
     playCanvas.drawCenter = true;
 
+    document.getElementById("start-game")?.addEventListener("click", () => {
+        document.getElementById("intro-overlay")!.classList.add("hidden");
+        loadLevel(0);
+    });
     document.getElementById("play-reset")?.addEventListener("click", resetPlayCanvas);
     document.getElementById("play-done")?.addEventListener("click", checkCompletion);
 
@@ -27,8 +31,6 @@ namespace game {
     document.getElementById("grid")!.dispatchEvent(new InputEvent("input"));
 
     setupScaleUI();
-
-    loadLevel(0);
 
     function setupScaleUI() {
         const scaleElement: HTMLInputElement = <HTMLInputElement>document.getElementById("scale-ui")!;
@@ -44,7 +46,7 @@ namespace game {
     function updateScaleUI() {
         document.querySelectorAll(".scale-dot").forEach(el => {
             let scale = Number((<HTMLElement>el).dataset.scale);
-            if(scale >= currentScaleLevel) {
+            if (scale >= currentScaleLevel) {
                 el.classList.add("filled");
             } else {
                 el.classList.remove("filled");
@@ -62,11 +64,13 @@ namespace game {
         playCanvas.draw(_event.offsetX, _event.offsetY, path, cutout);
     }
 
-    function loadLevel(_id: number) {
+    export function loadLevel(_id: number) {
         if (levels.length <= _id) {
-            console.log("you won!");
+            document.getElementById("game-over-overlay")!.classList.remove("hidden");
             return;
         }
+
+        document.getElementById("lvl-display")!.innerText = "Level " + (currentLevel + 1);
         currentLevel = _id;
         resetPlayCanvas();
 
@@ -126,7 +130,7 @@ namespace game {
         updateScaleUI();
     }
 
-    function resetPlayCanvas() {
+    export function resetPlayCanvas() {
         playCanvas.reset();
         currentScaleLevel = 0;
         updateScaleUI();

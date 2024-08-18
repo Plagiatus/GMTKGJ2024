@@ -44,8 +44,10 @@ var game;
             };
             this.canvas = document.getElementById(_canvasID);
             this.context = this.canvas.getContext("2d");
-            this.canvas.width = this.canvas.parentElement.offsetWidth;
-            this.canvas.height = this.canvas.parentElement.offsetHeight;
+            // this.canvas.width = this.canvas.parentElement!.clientWidth;
+            // this.canvas.height = this.canvas.parentElement!.clientHeight;
+            this.canvas.width = 300;
+            this.canvas.height = 300;
             requestAnimationFrame(this.drawScalingImage);
         }
         get scale() {
@@ -190,11 +192,21 @@ var game;
     let checkImagePlayer;
     const scanPercentage = document.getElementById("level-completed-scan");
     const resultPercentage = document.getElementById("level-completed-result");
+    const resultTime = document.getElementById("level-completed-time");
+    const resultSteps = document.getElementById("level-completed-steps");
     const resultText = document.getElementById("result-text");
+    const buttonNext = document.getElementById("button-next");
+    buttonNext.addEventListener("click", nextLevel);
+    document.getElementById("button-retry").addEventListener("click", retry);
     function checkCompletion() {
         canvas.width = canvasCheck1.width = canvasCheck2.width = game.playCanvas.canvas.width;
         canvas.height = canvasCheck1.height = canvasCheck2.height = game.playCanvas.canvas.height;
         overlay.classList.remove("hidden");
+        resultPercentage.parentElement.classList.add("hidden");
+        resultTime.parentElement.classList.add("hidden");
+        resultSteps.parentElement.classList.add("hidden");
+        resultText.classList.add("hidden");
+        buttonNext.disabled = true;
         drawInitial();
         initCheck();
     }
@@ -281,19 +293,50 @@ var game;
         resultPercentage.innerText = `${Math.round(percentage * 100 * 10) / 10}%`;
         if (percentage < 0.70) {
             resultText.innerText = "FAILED";
+            resultText.classList.add("red-dot");
+            resultText.classList.remove("yellow-dot", "green-dot");
         }
         else if (percentage < 0.85) {
+            resultText.classList.add("yellow-dot");
+            resultText.classList.remove("red-dot", "green-dot");
             resultText.innerText = "Let's hope the customer doesn't notice the slight differences...";
         }
         else if (percentage < 0.90) {
+            resultText.classList.add("yellow-dot");
+            resultText.classList.remove("red-dot", "green-dot");
             resultText.innerText = "I'd say close enough but that's just not true. I know you can do better.";
         }
         else if (percentage < 0.95) {
+            resultText.classList.add("green-dot");
+            resultText.classList.remove("red-dot", "yellow-dot");
             resultText.innerText = "That's really good! Almost perfect!";
         }
         else {
+            resultText.classList.add("green-dot");
+            resultText.classList.remove("red-dot", "yellow-dot");
             resultText.innerText = "Amazing!";
         }
+        resultPercentage.parentElement.classList.remove("hidden");
+        setTimeout(() => {
+            resultTime.parentElement.classList.remove("hidden");
+        }, 500);
+        setTimeout(() => {
+            resultSteps.parentElement.classList.remove("hidden");
+        }, 1000);
+        setTimeout(() => {
+            resultText.classList.remove("hidden");
+            if (percentage >= 0.70) {
+                buttonNext.disabled = false;
+            }
+        }, 1500);
+    }
+    function nextLevel() {
+        game.loadLevel(game.currentLevel + 1);
+        overlay.classList.add("hidden");
+    }
+    function retry() {
+        overlay.classList.add("hidden");
+        game.resetPlayCanvas();
     }
 })(game || (game = {}));
 var game;
@@ -364,7 +407,7 @@ var game;
 ///<reference path="canvas.ts"/>
 ///<reference path="level.ts"/>
 (function (game) {
-    var _a, _b;
+    var _a, _b, _c;
     game.playCanvas = new game.Canvas("play-canvas");
     game.targetCanvas = new game.Canvas("target-canvas");
     game.currentLevel = 0;
@@ -380,13 +423,16 @@ var game;
     game.playCanvas.canvas.addEventListener("mouseleave", () => game.playCanvas.preview(0, 0, new Path2D(), false));
     game.playCanvas.canvas.addEventListener("wheel", scaleWithMouse);
     game.playCanvas.drawCenter = true;
-    (_a = document.getElementById("play-reset")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", resetPlayCanvas);
-    (_b = document.getElementById("play-done")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", game.checkCompletion);
+    (_a = document.getElementById("start-game")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
+        document.getElementById("intro-overlay").classList.add("hidden");
+        loadLevel(0);
+    });
+    (_b = document.getElementById("play-reset")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", resetPlayCanvas);
+    (_c = document.getElementById("play-done")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", game.checkCompletion);
     document.getElementById("cutout").addEventListener("input", toggleCutout);
     document.getElementById("grid").addEventListener("input", toggleGrid);
     document.getElementById("grid").dispatchEvent(new InputEvent("input"));
     setupScaleUI();
-    loadLevel(0);
     function setupScaleUI() {
         const scaleElement = document.getElementById("scale-ui");
         for (let i = maxScale; i >= minScale; i -= scaleStep) {
@@ -418,9 +464,10 @@ var game;
     }
     function loadLevel(_id) {
         if (game.levels.length <= _id) {
-            console.log("you won!");
+            document.getElementById("game-over-overlay").classList.remove("hidden");
             return;
         }
+        document.getElementById("lvl-display").innerText = "Level " + (game.currentLevel + 1);
         game.currentLevel = _id;
         resetPlayCanvas();
         let level = game.levels[_id];
@@ -451,6 +498,7 @@ var game;
         cutoutCheckbox.checked = false;
         cutoutCheckbox.disabled = !level.cutout;
     }
+    game.loadLevel = loadLevel;
     function scaleWithMouse(_event) {
         let direction = Math.sign(_event.deltaY);
         setScale(currentScaleLevel + direction * scaleStep);
@@ -478,6 +526,7 @@ var game;
         currentScaleLevel = 0;
         updateScaleUI();
     }
+    game.resetPlayCanvas = resetPlayCanvas;
     function toggleGrid(_event) {
         game.playCanvas.enabledGrid = _event.target.checked;
     }

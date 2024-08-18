@@ -23,8 +23,10 @@ namespace game {
             this.canvas = <HTMLCanvasElement>document.getElementById(_canvasID);
             this.context = this.canvas.getContext("2d")!;
 
-            this.canvas.width = this.canvas.parentElement!.offsetWidth;
-            this.canvas.height = this.canvas.parentElement!.offsetHeight;
+            // this.canvas.width = this.canvas.parentElement!.clientWidth;
+            // this.canvas.height = this.canvas.parentElement!.clientHeight;
+            this.canvas.width = 300;
+            this.canvas.height = 300;
             requestAnimationFrame(this.drawScalingImage)
         }
 

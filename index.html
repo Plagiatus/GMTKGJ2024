@@ -27,45 +27,97 @@
                         <label for="grid" class="dot">Grid</label>
                     </div>
                     <div>
-                        <button id="play-reset">Reset</button>
+                        <button id="play-reset" class="danger">Reset</button>
                         <button id="play-done">Done</button>
                     </div>
                 </div>
             </div>
             <div id="shape-select">
+                <h3>Shapes</h3>
                 <div id="shapes"></div>
                 <input type="checkbox" name="cutout" id="cutout" hidden>
                 <label for="cutout" id="cutout-block">Block</label>
                 <label for="cutout" id="cutout-cutout">Cutout</label>
             </div>
             <div id="target" class="canvas-wrapper">
-                <h2>Order</h2>
+                <h2 id="lvl-display">Level</h2>
                 <div>
                     <canvas id="target-canvas"></canvas>
                 </div>
+                <div id="stat-panel">
+                    <div>
+                        <span>Time</span>
+                        <span id="current-time">0s</span>
+                    </div>
+                    <div>
+                        <span>Steps</span>
+                        <span id="current-steps">0</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <div id="intro-overlay"></div>
+        <div id="intro-overlay">
+            <div class="popup">
+                <h1>The Everything Factory</h1>
+                <p style="margin: 1em 0; font-size: 1.2em;"><strong>Replicate the Part on the right as accurately as possible.</strong></p>
+                <p style="margin: 1em 0;">Your shapes are always placed with the same size, but what was placed can be scaled.</p>
+                <p style="margin: 1em 0;">In different levels you'll have different shapes at your disposal.</p>
+                <p style="margin: 1em 0;">In some levels you can switch to cutouts instead of shapes.</p>
+
+                <h3>Have fun</h3>
+
+                <p style="font-size: small;">Sorry, didn't have time for a better intro.</p>
+                <p style="font-size: small;">Made for the <a href="https://itch.io/jam/gmtk-2024" target="_blank" rel="noopener noreferrer">GMTK GameJam 2024</a> in about 10 hours in HTML, CSS & JS</p>
+                <button id="start-game">Start</button>
+            </div>
+        </div>
         <div id="level-completed-overlay" class="hidden">
             <div class="popup">
-                <div class="result-wrapper">
-                    <span>
-                        Scanning
-                    </span>
-                    <span class="result-percentage" id="level-completed-scan">
-                        0%
-                    </span>
+                <div id="result-outer-wrapper">
+                    <div class="result-wrapper important">
+                        <span>
+                            Scanning
+                        </span>
+                        <span class="result-percentage" id="level-completed-scan">
+                            0%
+                        </span>
+                    </div>
+                    <canvas></canvas>
+                    <div id="results-wrapper">
+                        <div class="result-wrapper important">
+                            <span>
+                                Result
+                            </span>
+                            <span class="result-percentage" id="level-completed-result">
+                                0%
+                            </span>
+                        </div>
+                        <div class="result-wrapper">
+                            <span>Time</span>
+                            <span class="result-percentage" id="level-completed-time">0s</span>
+                        </div>
+                        <div class="result-wrapper">
+                            <span>Steps</span>
+                            <span class="result-percentage" id="level-completed-steps">0</span>
+                        </div>
+                    </div>
                 </div>
-                <canvas></canvas>
-                <div class="result-wrapper">
-                    <span>
-                        Result
-                    </span>
-                    <span class="result-percentage" id="level-completed-result">
-                        0%
-                    </span>
-                    <span id="result-text"></span>
+                <span id="result-text">Scanning...</span>
+                <div>
                 </div>
+                <div>
+                    <button id="button-retry" class="danger">Retry</button>
+                    <button id="button-next" disabled>Next</button>
+                </div>
+            </div>
+        </div>
+        <div id="game-over-overlay" class="hidden">
+            <div class="popup">
+                <h1>You Won</h1>
+                <p>You completed all the puzzles I managed to put in.</p>
+                <p style="margin-top: 1em;">Thank you for playing!</p>
+                <div style="height: 2em;"></div>
+                <p><a href="https://plagiatus.itch.io" target="_blank" rel="noopener noreferrer">Check out the other gamejam games I've made</a></p>
             </div>
         </div>
     </div>

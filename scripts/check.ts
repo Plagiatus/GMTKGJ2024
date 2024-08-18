@@ -13,12 +13,24 @@ namespace game {
 
     const scanPercentage: HTMLElement = document.getElementById("level-completed-scan")!;
     const resultPercentage: HTMLElement = document.getElementById("level-completed-result")!;
+    const resultTime: HTMLElement = document.getElementById("level-completed-time")!;
+    const resultSteps: HTMLElement = document.getElementById("level-completed-steps")!;
     const resultText: HTMLElement = document.getElementById("result-text")!;
+    const buttonNext: HTMLButtonElement = <HTMLButtonElement>document.getElementById("button-next")!;
+
+    buttonNext.addEventListener("click", nextLevel);
+    document.getElementById("button-retry")!.addEventListener("click", retry);
 
     export function checkCompletion() {
         canvas.width = canvasCheck1.width = canvasCheck2.width = playCanvas.canvas.width;
         canvas.height = canvasCheck1.height = canvasCheck2.height = playCanvas.canvas.height;
         overlay.classList.remove("hidden");
+        resultPercentage.parentElement!.classList.add("hidden");
+        resultTime.parentElement!.classList.add("hidden");
+        resultSteps.parentElement!.classList.add("hidden");
+        resultText.classList.add("hidden");
+        buttonNext.disabled = true;
+
         drawInitial();
         initCheck();
     }
@@ -113,18 +125,52 @@ namespace game {
 
         if (percentage < 0.70) {
             resultText.innerText = "FAILED";
+            resultText.classList.add("red-dot");
+            resultText.classList.remove("yellow-dot", "green-dot");
         }
         else if (percentage < 0.85) {
+            resultText.classList.add("yellow-dot");
+            resultText.classList.remove("red-dot", "green-dot");
             resultText.innerText = "Let's hope the customer doesn't notice the slight differences...";
         }
         else if (percentage < 0.90) {
+            resultText.classList.add("yellow-dot");
+            resultText.classList.remove("red-dot", "green-dot");
             resultText.innerText = "I'd say close enough but that's just not true. I know you can do better.";
         }
         else if (percentage < 0.95) {
+            resultText.classList.add("green-dot");
+            resultText.classList.remove("red-dot", "yellow-dot");
             resultText.innerText = "That's really good! Almost perfect!";
         }
         else {
+            resultText.classList.add("green-dot");
+            resultText.classList.remove("red-dot", "yellow-dot");
             resultText.innerText = "Amazing!";
         }
+        
+        resultPercentage.parentElement!.classList.remove("hidden");
+        setTimeout(()=>{
+            resultTime.parentElement!.classList.remove("hidden");
+        }, 500);
+        setTimeout(()=>{
+            resultSteps.parentElement!.classList.remove("hidden");
+        }, 1000);
+        setTimeout(()=>{
+            resultText.classList.remove("hidden");
+            if(percentage >= 0.70) {
+                buttonNext.disabled = false;
+            }
+        }, 1500);
+    }
+
+    function nextLevel(){
+        loadLevel(currentLevel + 1);
+        overlay.classList.add("hidden");
+    }
+    
+    function retry(){
+        overlay.classList.add("hidden");
+        resetPlayCanvas();
     }
 }
