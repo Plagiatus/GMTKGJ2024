@@ -8,9 +8,9 @@ namespace game {
     targetCanvas.drawCenter = true;
     let selectedShape: SHAPE = SHAPE.SQUARE;
     let currentScaleLevel: number = 0;
-    const maxScale: number = 1;
-    const minScale: number = -1;
-    const scaleStep: number = 0.25;
+    const maxScale: number = 0.5;
+    const minScale: number = -0.5;
+    const scaleStep: number = 0.1;
     let cutout: boolean = false;
 
     playCanvas.canvas.addEventListener("mousemove", mouseOverPlayCanvas);
