@@ -3,7 +3,7 @@ namespace game {
     const canvas: HTMLCanvasElement = overlay.querySelector("canvas")!
     const context: CanvasRenderingContext2D = canvas.getContext("2d")!;
     let currentImage: ImageData;
-    
+
     const canvasCheck1: HTMLCanvasElement = document.createElement("canvas");
     const canvasCheck2: HTMLCanvasElement = document.createElement("canvas");
     const contextCheckOriginal = canvasCheck1.getContext("2d")!;
@@ -30,15 +30,15 @@ namespace game {
 
         context.fillStyle = "rgba(0, 0, 0, 0.5)";
         // original
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.fill(levels[currentLevel].orderPath());
-        contextCheckOriginal.translate(canvas.width / 2, canvas.height / 2);
-        contextCheckOriginal.fill(levels[currentLevel].orderPath());
+        targetCanvas.drawCenter = false;
+        targetCanvas.drawCurrent(context, false);
+        targetCanvas.drawCurrent(contextCheckOriginal, true);
+        targetCanvas.drawCenter = true;
 
         //current
         playCanvas.drawCenter = false;
         playCanvas.drawCurrent(context, false);
-        playCanvas.drawCurrent(contextCheckPlayer, false);
+        playCanvas.drawCurrent(contextCheckPlayer, true);
         playCanvas.drawCenter = true;
     }
 
@@ -81,11 +81,11 @@ namespace game {
                 if (alphaOriginal === 0 && alphaPlayer === 0) continue;
                 if (alphaOriginal > 0 && alphaPlayer > 0) {
                     //correct
-                    setPixel(pos, currentImage, 62, 203, 52, 255);
+                    setPixel(pos, currentImage, 62, 203, 52);
                     check.correct++;
                 } else {
                     //wrong
-                    setPixel(pos, currentImage, 203, 52, 62, 255);
+                    setPixel(pos, currentImage, 203, 52, 62);
                     check.incorrect++;
                 }
             }
@@ -96,11 +96,13 @@ namespace game {
         check.currentY += linesPerFrame;
     }
 
-    function setPixel(pos: number, imageData: ImageData, r: number, g: number, b: number, a: number) {
+    function setPixel(pos: number, imageData: ImageData, r: number, g: number, b: number, a?: number) {
         imageData.data[pos + 0] = r;
         imageData.data[pos + 1] = g;
         imageData.data[pos + 2] = b;
-        imageData.data[pos + 3] = a;
+        if (a !== undefined) {
+            imageData.data[pos + 3] = a;
+        }
     }
 
     function checkCompleted() {
@@ -109,16 +111,16 @@ namespace game {
         console.log(check, percentage);
         resultPercentage.innerText = `${Math.round(percentage * 100 * 10) / 10}%`;
 
-        if(percentage < 0.70){
+        if (percentage < 0.70) {
             resultText.innerText = "FAILED";
         }
-        else if(percentage < 0.85){
+        else if (percentage < 0.85) {
             resultText.innerText = "Let's hope the customer doesn't notice the slight differences...";
         }
-        else if(percentage < 0.90){
+        else if (percentage < 0.90) {
             resultText.innerText = "I'd say close enough but that's just not true. I know you can do better.";
         }
-        else if(percentage < 0.95){
+        else if (percentage < 0.95) {
             resultText.innerText = "That's really good! Almost perfect!";
         }
         else {

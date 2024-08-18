@@ -95,14 +95,15 @@ var game;
             __classPrivateFieldSet(this, _Canvas_animStartTime, -1, "f");
             __classPrivateFieldSet(this, _Canvas_scaledScale, Math.pow(10, _newScale), "f");
         }
-        preview(_posX, _posY, _path) {
+        preview(_posX, _posY, _path, _cutout) {
             this.drawCurrent();
             this.context.fillStyle = "rgba(255, 0, 0, 0.5)";
-            __classPrivateFieldSet(this, _Canvas_lastPreview, this.makeStep(_posX, _posY, _path), "f");
+            this.context.strokeStyle = "rgba(255, 0, 0, 0.5)";
+            __classPrivateFieldSet(this, _Canvas_lastPreview, this.makeStep(_posX, _posY, _path, _cutout), "f");
             this.drawOneStep(__classPrivateFieldGet(this, _Canvas_lastPreview, "f"));
         }
-        draw(_posX, _posY, _path) {
-            this.drawingSteps.push(this.makeStep(_posX, _posY, _path));
+        draw(_posX, _posY, _path, _cutout) {
+            this.drawingSteps.push(this.makeStep(_posX, _posY, _path, false, _cutout));
             __classPrivateFieldSet(this, _Canvas_lastPreview, undefined, "f");
             this.drawCurrent();
         }
@@ -112,6 +113,7 @@ var game;
             this.context.reset();
             this.drawingSteps = [];
             __classPrivateFieldSet(this, _Canvas_scale, __classPrivateFieldSet(this, _Canvas_currentScale, 0, "f"), "f");
+            __classPrivateFieldSet(this, _Canvas_scaledScale, Math.pow(10, __classPrivateFieldGet(this, _Canvas_currentScale, "f")), "f");
             this.drawCurrent();
         }
         drawCurrent(context = this.context, reset = true) {
@@ -135,9 +137,21 @@ var game;
             context.translate(context.canvas.width / 2, context.canvas.height / 2);
             context.scale(step.scale / __classPrivateFieldGet(this, _Canvas_scaledScale, "f"), step.scale / __classPrivateFieldGet(this, _Canvas_scaledScale, "f"));
             context.translate(step.pos.x, step.pos.y);
-            context.fill(step.path);
+            if (step.cutout) {
+                // context.stroke(step.path);
+                context.globalCompositeOperation = "destination-out";
+                // context.fillStyle = "rgba(0,0,0,0.1)";
+                context.fill(step.path);
+                context.globalCompositeOperation = "source-over";
+            }
+            else if (step.outline) {
+                context.stroke(step.path);
+            }
+            else {
+                context.fill(step.path);
+            }
         }
-        makeStep(_posX, _posY, _path) {
+        makeStep(_posX, _posY, _path, _outline = false, _cutout = false) {
             // to canvas coordinates
             let x = _posX - this.canvas.width / 2;
             let y = _posY - this.canvas.height / 2;
@@ -154,6 +168,8 @@ var game;
                 path: _path,
                 pos: { x, y },
                 scale: __classPrivateFieldGet(this, _Canvas_scaledScale, "f"),
+                cutout: _cutout,
+                outline: _outline,
             };
         }
     }
@@ -189,14 +205,14 @@ var game;
         contextCheckPlayer.reset();
         context.fillStyle = "rgba(0, 0, 0, 0.5)";
         // original
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.fill(game.levels[game.currentLevel].orderPath());
-        contextCheckOriginal.translate(canvas.width / 2, canvas.height / 2);
-        contextCheckOriginal.fill(game.levels[game.currentLevel].orderPath());
+        game.targetCanvas.drawCenter = false;
+        game.targetCanvas.drawCurrent(context, false);
+        game.targetCanvas.drawCurrent(contextCheckOriginal, true);
+        game.targetCanvas.drawCenter = true;
         //current
         game.playCanvas.drawCenter = false;
         game.playCanvas.drawCurrent(context, false);
-        game.playCanvas.drawCurrent(contextCheckPlayer, false);
+        game.playCanvas.drawCurrent(contextCheckPlayer, true);
         game.playCanvas.drawCenter = true;
     }
     const check = { correct: 0, incorrect: 0, currentY: 0 };
@@ -237,12 +253,12 @@ var game;
                     continue;
                 if (alphaOriginal > 0 && alphaPlayer > 0) {
                     //correct
-                    setPixel(pos, currentImage, 62, 203, 52, 255);
+                    setPixel(pos, currentImage, 62, 203, 52);
                     check.correct++;
                 }
                 else {
                     //wrong
-                    setPixel(pos, currentImage, 203, 52, 62, 255);
+                    setPixel(pos, currentImage, 203, 52, 62);
                     check.incorrect++;
                 }
             }
@@ -255,7 +271,9 @@ var game;
         imageData.data[pos + 0] = r;
         imageData.data[pos + 1] = g;
         imageData.data[pos + 2] = b;
-        imageData.data[pos + 3] = a;
+        if (a !== undefined) {
+            imageData.data[pos + 3] = a;
+        }
     }
     function checkCompleted() {
         let percentage = check.correct / (check.correct + check.incorrect);
@@ -315,16 +333,28 @@ var game;
 var game;
 /// <reference path="shapes.ts" />
 (function (game) {
+    var _a, _b, _c;
     game.levels = [
         {
-            orderPath() {
-                let path = new Path2D();
-                path.arc(0, game.shapeSize, game.shapeSize / 2, 0, Math.PI * 2);
-                path.rect(-game.shapeSize / 2, -game.shapeSize / 2, game.shapeSize, game.shapeSize);
-                path.arc(0, -game.shapeSize, game.shapeSize / 2, 0, Math.PI * 2);
-                return path;
-            },
-            shapes: [game.SHAPE.SQUARE, game.SHAPE.CIRCLE]
+            steps: [
+                {
+                    path: (_a = game.shapes.get(game.SHAPE.SQUARE)) === null || _a === void 0 ? void 0 : _a.path(),
+                    pos: { x: 0, y: 0 },
+                    scale: 1
+                },
+                {
+                    path: (_b = game.shapes.get(game.SHAPE.CIRCLE)) === null || _b === void 0 ? void 0 : _b.path(),
+                    pos: { x: 0, y: game.shapeSize },
+                    scale: 1
+                },
+                {
+                    path: (_c = game.shapes.get(game.SHAPE.CIRCLE)) === null || _c === void 0 ? void 0 : _c.path(),
+                    pos: { x: 0, y: -game.shapeSize },
+                    scale: 1
+                },
+            ],
+            shapes: [game.SHAPE.SQUARE, game.SHAPE.CIRCLE],
+            cutout: true,
         }
     ];
 })(game || (game = {}));
@@ -343,24 +373,48 @@ var game;
     let currentScaleLevel = 0;
     const maxScale = 1;
     const minScale = -1;
+    const scaleStep = 0.25;
+    let cutout = false;
     game.playCanvas.canvas.addEventListener("mousemove", mouseOverPlayCanvas);
     game.playCanvas.canvas.addEventListener("click", mouseClickOnPlayCanvas);
-    game.playCanvas.canvas.addEventListener("mouseleave", () => game.playCanvas.preview(0, 0, new Path2D()));
+    game.playCanvas.canvas.addEventListener("mouseleave", () => game.playCanvas.preview(0, 0, new Path2D(), false));
     game.playCanvas.canvas.addEventListener("wheel", scaleWithMouse);
     game.playCanvas.drawCenter = true;
     (_a = document.getElementById("play-reset")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", resetPlayCanvas);
     (_b = document.getElementById("play-done")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", game.checkCompletion);
-    const scaleElement = document.getElementById("scale");
-    scaleElement.addEventListener("input", scaleWithInput);
+    document.getElementById("cutout").addEventListener("input", toggleCutout);
     document.getElementById("grid").addEventListener("input", toggleGrid);
+    document.getElementById("grid").dispatchEvent(new InputEvent("input"));
+    setupScaleUI();
     loadLevel(0);
+    function setupScaleUI() {
+        const scaleElement = document.getElementById("scale-ui");
+        for (let i = maxScale; i >= minScale; i -= scaleStep) {
+            let span = document.createElement("span");
+            span.classList.add("scale-dot");
+            span.dataset.scale = i.toString();
+            span.addEventListener("click", scaleWithInput);
+            scaleElement.appendChild(span);
+        }
+    }
+    function updateScaleUI() {
+        document.querySelectorAll(".scale-dot").forEach(el => {
+            let scale = Number(el.dataset.scale);
+            if (scale >= currentScaleLevel) {
+                el.classList.add("filled");
+            }
+            else {
+                el.classList.remove("filled");
+            }
+        });
+    }
     function mouseOverPlayCanvas(_event) {
         let path = game.shapes.get(selectedShape).path();
-        game.playCanvas.preview(_event.offsetX, _event.offsetY, path);
+        game.playCanvas.preview(_event.offsetX, _event.offsetY, path, cutout);
     }
     function mouseClickOnPlayCanvas(_event) {
         let path = game.shapes.get(selectedShape).path();
-        game.playCanvas.draw(_event.offsetX, _event.offsetY, path);
+        game.playCanvas.draw(_event.offsetX, _event.offsetY, path, cutout);
     }
     function loadLevel(_id) {
         if (game.levels.length <= _id) {
@@ -371,17 +425,18 @@ var game;
         resetPlayCanvas();
         let level = game.levels[_id];
         game.targetCanvas.reset();
-        game.targetCanvas.draw(game.targetCanvas.canvas.width / 2, game.targetCanvas.canvas.height / 2, level.orderPath());
-        const shapeWrapper = document.getElementById("shape-select");
+        game.targetCanvas.drawingSteps = level.steps;
+        game.targetCanvas.drawCurrent();
+        const shapeWrapper = document.getElementById("shapes");
         const newShapes = [];
         for (let shape of level.shapes) {
             let div = document.createElement("div");
             let canvas = document.createElement("canvas");
-            canvas.width = 100;
-            canvas.height = 100;
+            canvas.width = game.shapeSize * 1.5;
+            canvas.height = game.shapeSize * 1.5;
             div.appendChild(canvas);
             let ctx = canvas.getContext("2d");
-            ctx.translate(50, 50);
+            ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.fill(game.shapes.get(shape).path());
             newShapes.push(div);
             div.addEventListener("click", () => {
@@ -392,15 +447,19 @@ var game;
         }
         shapeWrapper.replaceChildren(...newShapes);
         newShapes[0].dispatchEvent(new MouseEvent("click"));
+        let cutoutCheckbox = document.getElementById("cutout");
+        cutoutCheckbox.checked = false;
+        cutoutCheckbox.disabled = !level.cutout;
     }
     function scaleWithMouse(_event) {
         let direction = Math.sign(_event.deltaY);
-        setScale(currentScaleLevel + direction * 0.1);
+        setScale(currentScaleLevel + direction * scaleStep);
         mouseOverPlayCanvas(_event);
     }
     function scaleWithInput(_event) {
-        setScale(-_event.target.value);
+        setScale(+_event.target.dataset.scale);
         game.playCanvas.drawCurrent();
+        updateScaleUI();
     }
     function setScale(_amt) {
         _amt = Math.round(_amt * 10) / 10;
@@ -412,14 +471,18 @@ var game;
         else {
             currentScaleLevel = nextScaleLevel;
         }
-        scaleElement.value = "" + -currentScaleLevel;
+        updateScaleUI();
     }
     function resetPlayCanvas() {
         game.playCanvas.reset();
-        scaleElement.value = "0";
+        currentScaleLevel = 0;
+        updateScaleUI();
     }
     function toggleGrid(_event) {
         game.playCanvas.enabledGrid = _event.target.checked;
+    }
+    function toggleCutout(_event) {
+        cutout = _event.target.checked;
     }
 })(game || (game = {}));
 //# sourceMappingURL=script.js.map

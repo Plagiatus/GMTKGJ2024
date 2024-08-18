@@ -2,20 +2,32 @@
 
 namespace game {
     interface Level {
-        orderPath: () => Path2D;
+        steps: DrawingStep[];
         shapes: SHAPE[];
+        cutout?: boolean;
     }
 
     export const levels: Level[] = [
         {
-            orderPath() {
-                let path = new Path2D();
-                path.arc(0, shapeSize, shapeSize / 2, 0, Math.PI * 2);
-                path.rect(-shapeSize / 2, -shapeSize / 2, shapeSize, shapeSize);
-                path.arc(0, -shapeSize, shapeSize / 2, 0, Math.PI * 2);
-                return path;
-            },
-            shapes: [SHAPE.SQUARE, SHAPE.CIRCLE]
+            steps: [
+                {
+                    path: shapes.get(SHAPE.SQUARE)?.path()!,
+                    pos: {x: 0, y: 0},
+                    scale: 1
+                },
+                {
+                    path: shapes.get(SHAPE.CIRCLE)?.path()!,
+                    pos: {x: 0, y: shapeSize},
+                    scale: 1
+                },
+                {
+                    path: shapes.get(SHAPE.CIRCLE)?.path()!,
+                    pos: {x: 0, y: -shapeSize},
+                    scale: 1
+                },
+            ],
+            shapes: [SHAPE.SQUARE, SHAPE.CIRCLE],
+            cutout: true,
         }
     ]
 }

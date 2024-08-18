@@ -1,8 +1,10 @@
 namespace game {
-    interface DrawingStep {
+    export interface DrawingStep {
         path: Path2D,
         pos: { x: number, y: number },
         scale: number,
+        outline?: boolean,
+        cutout?: boolean,
     }
     export class Canvas {
         canvas: HTMLCanvasElement;
@@ -98,14 +100,15 @@ namespace game {
             this.#scaledScale = Math.pow(10, _newScale);
         }
 
-        preview(_posX: number, _posY: number, _path: Path2D) {
+        preview(_posX: number, _posY: number, _path: Path2D, _cutout: boolean) {
             this.drawCurrent();
             this.context.fillStyle = "rgba(255, 0, 0, 0.5)";
-            this.#lastPreview = this.makeStep(_posX, _posY, _path);
+            this.context.strokeStyle = "rgba(255, 0, 0, 0.5)";
+            this.#lastPreview = this.makeStep(_posX, _posY, _path, _cutout);
             this.drawOneStep(this.#lastPreview)
         }
-        draw(_posX: number, _posY: number, _path: Path2D) {
-            this.drawingSteps.push(this.makeStep(_posX, _posY, _path));
+        draw(_posX: number, _posY: number, _path: Path2D, _cutout: boolean) {
+            this.drawingSteps.push(this.makeStep(_posX, _posY, _path, false, _cutout));
             this.#lastPreview = undefined;
             this.drawCurrent();
         }
@@ -115,6 +118,7 @@ namespace game {
             this.context.reset();
             this.drawingSteps = [];
             this.#scale = this.#currentScale = 0;
+            this.#scaledScale = Math.pow(10, this.#currentScale);
             this.drawCurrent();
         }
         drawCurrent(context = this.context, reset: boolean = true) {
@@ -139,9 +143,19 @@ namespace game {
             context.translate(context.canvas.width / 2, context.canvas.height / 2);
             context.scale(step.scale / this.#scaledScale, step.scale / this.#scaledScale);
             context.translate(step.pos.x, step.pos.y);
-            context.fill(step.path);
+            if(step.cutout){
+                // context.stroke(step.path);
+                context.globalCompositeOperation = "destination-out";
+                // context.fillStyle = "rgba(0,0,0,0.1)";
+                context.fill(step.path);
+                context.globalCompositeOperation = "source-over";
+            } else if (step.outline){
+                context.stroke(step.path);
+            } else {
+                context.fill(step.path);
+            }
         }
-        private makeStep(_posX: number, _posY: number, _path: Path2D): DrawingStep {
+        private makeStep(_posX: number, _posY: number, _path: Path2D, _outline: boolean = false, _cutout: boolean = false): DrawingStep {
             // to canvas coordinates
             let x = _posX - this.canvas.width / 2;
             let y = _posY - this.canvas.height / 2;
@@ -160,6 +174,8 @@ namespace game {
                 path: _path,
                 pos: { x, y },
                 scale: this.#scaledScale,
+                cutout: _cutout,
+                outline: _outline,
             }
 
         }
