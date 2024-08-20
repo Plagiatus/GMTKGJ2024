@@ -316,6 +316,7 @@ var game;
             resultText.classList.remove("red-dot", "yellow-dot");
             resultText.innerText = "Amazing!";
         }
+        resultSteps.innerText = game.currentStepAmount.toString();
         resultPercentage.parentElement.classList.remove("hidden");
         setTimeout(() => {
             resultTime.parentElement.classList.remove("hidden");
@@ -331,7 +332,7 @@ var game;
         }, 1500);
     }
     function nextLevel() {
-        game.loadLevel(game.currentLevel + 1);
+        game.loadLevelId(game.currentLevel + 1);
         overlay.classList.add("hidden");
     }
     function retry() {
@@ -376,29 +377,94 @@ var game;
 var game;
 /// <reference path="shapes.ts" />
 (function (game) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
     game.levels = [
+        {
+            steps: [{
+                    path: (_a = game.shapes.get(game.SHAPE.SQUARE)) === null || _a === void 0 ? void 0 : _a.path(),
+                    pos: { x: 0, y: 0 },
+                    scale: 1,
+                    cutout: false,
+                    outline: false
+                }],
+            finalScale: -0.2,
+            shapes: [game.SHAPE.SQUARE],
+            cutout: false,
+        },
         {
             steps: [
                 {
-                    path: (_a = game.shapes.get(game.SHAPE.SQUARE)) === null || _a === void 0 ? void 0 : _a.path(),
+                    path: (_b = game.shapes.get(game.SHAPE.SQUARE)) === null || _b === void 0 ? void 0 : _b.path(),
+                    pos: { x: 0, y: 40 },
+                    scale: 0.5835525887331022,
+                    cutout: false,
+                    outline: false
+                },
+                {
+                    path: (_c = game.shapes.get(game.SHAPE.SQUARE)) === null || _c === void 0 ? void 0 : _c.path(),
+                    pos: { x: 0, y: 0 },
+                    scale: 0.9988033722822518,
+                    cutout: false,
+                    outline: false
+                },
+                {
+                    path: (_d = game.shapes.get(game.SHAPE.SQUARE)) === null || _d === void 0 ? void 0 : _d.path(),
+                    pos: { x: 0, y: -40 },
+                    scale: 0.794255077759259,
+                    cutout: false,
+                    outline: false
+                }
+            ],
+            finalScale: -0.1,
+            shapes: [game.SHAPE.SQUARE],
+            cutout: false,
+        },
+        {
+            steps: [
+                {
+                    path: (_e = game.shapes.get(game.SHAPE.SQUARE)) === null || _e === void 0 ? void 0 : _e.path(),
                     pos: { x: 0, y: 0 },
                     scale: 1
                 },
                 {
-                    path: (_b = game.shapes.get(game.SHAPE.CIRCLE)) === null || _b === void 0 ? void 0 : _b.path(),
+                    path: (_f = game.shapes.get(game.SHAPE.CIRCLE)) === null || _f === void 0 ? void 0 : _f.path(),
                     pos: { x: 0, y: game.shapeSize },
                     scale: 1
                 },
                 {
-                    path: (_c = game.shapes.get(game.SHAPE.CIRCLE)) === null || _c === void 0 ? void 0 : _c.path(),
+                    path: (_g = game.shapes.get(game.SHAPE.CIRCLE)) === null || _g === void 0 ? void 0 : _g.path(),
                     pos: { x: 0, y: -game.shapeSize },
                     scale: 1
                 },
             ],
             shapes: [game.SHAPE.SQUARE, game.SHAPE.CIRCLE],
+            cutout: false,
+            finalScale: 0.1,
+        },
+        {
+            steps: [
+                {
+                    path: (_h = game.shapes.get(game.SHAPE.SQUARE)) === null || _h === void 0 ? void 0 : _h.path(),
+                    pos: { x: 0, y: 0 },
+                    scale: 1
+                },
+                {
+                    path: (_j = game.shapes.get(game.SHAPE.CIRCLE)) === null || _j === void 0 ? void 0 : _j.path(),
+                    pos: { x: 0, y: 0 },
+                    scale: Math.pow(10, -0.3),
+                    cutout: true,
+                },
+            ],
+            shapes: [game.SHAPE.SQUARE, game.SHAPE.CIRCLE],
             cutout: true,
-        }
+            finalScale: -0.3,
+        },
+        {
+            steps: [{ "path": (_k = game.shapes.get(game.SHAPE.SQUARE)) === null || _k === void 0 ? void 0 : _k.path(), "pos": { "x": 0, "y": 0 }, "scale": 1, "cutout": false, "outline": false }, { "path": (_l = game.shapes.get(game.SHAPE.HALF_CIRCLE)) === null || _l === void 0 ? void 0 : _l.path(), "pos": { "x": 0, "y": 0 }, "scale": 1, "cutout": true, "outline": false }, { "path": (_m = game.shapes.get(game.SHAPE.SQUARE)) === null || _m === void 0 ? void 0 : _m.path(), "pos": { "x": 0, "y": -40 }, "scale": 0.446827609139784, "cutout": false, "outline": false }, { "path": (_o = game.shapes.get(game.SHAPE.CIRCLE)) === null || _o === void 0 ? void 0 : _o.path(), "pos": { "x": 0, "y": 40 }, "scale": 0.446827609139784, "cutout": false, "outline": false }, { "path": (_p = game.shapes.get(game.SHAPE.CIRCLE)) === null || _p === void 0 ? void 0 : _p.path(), "pos": { "x": 40, "y": 0 }, "scale": 0.446827609139784, "cutout": false, "outline": false }, { "path": (_q = game.shapes.get(game.SHAPE.CIRCLE)) === null || _q === void 0 ? void 0 : _q.path(), "pos": { "x": -40, "y": 0 }, "scale": 0.446827609139784, "cutout": false, "outline": false }],
+            shapes: [game.SHAPE.SQUARE, game.SHAPE.CIRCLE, game.SHAPE.HALF_CIRCLE],
+            cutout: true,
+            finalScale: -0.3,
+        },
     ];
 })(game || (game = {}));
 ///<reference path="canvas.ts"/>
@@ -407,7 +473,7 @@ var game;
 ///<reference path="canvas.ts"/>
 ///<reference path="level.ts"/>
 (function (game) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     game.playCanvas = new game.Canvas("play-canvas");
     game.targetCanvas = new game.Canvas("target-canvas");
     game.currentLevel = 0;
@@ -418,6 +484,7 @@ var game;
     const minScale = -0.5;
     const scaleStep = 0.1;
     let cutout = false;
+    game.currentStepAmount = 0;
     game.playCanvas.canvas.addEventListener("mousemove", mouseOverPlayCanvas);
     game.playCanvas.canvas.addEventListener("click", mouseClickOnPlayCanvas);
     game.playCanvas.canvas.addEventListener("mouseleave", () => game.playCanvas.preview(0, 0, new Path2D(), false));
@@ -425,10 +492,11 @@ var game;
     game.playCanvas.drawCenter = true;
     (_a = document.getElementById("start-game")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
         document.getElementById("intro-overlay").classList.add("hidden");
-        loadLevel(0);
+        loadLevelId(0);
     });
     (_b = document.getElementById("play-reset")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", resetPlayCanvas);
     (_c = document.getElementById("play-done")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", game.checkCompletion);
+    (_d = document.getElementById("close-game-over")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", closeGameOver);
     document.getElementById("cutout").addEventListener("input", toggleCutout);
     document.getElementById("grid").addEventListener("input", toggleGrid);
     document.getElementById("grid").dispatchEvent(new InputEvent("input"));
@@ -461,18 +529,27 @@ var game;
     function mouseClickOnPlayCanvas(_event) {
         let path = game.shapes.get(selectedShape).path();
         game.playCanvas.draw(_event.offsetX, _event.offsetY, path, cutout);
+        game.currentStepAmount++;
+        document.getElementById("current-steps").innerText = game.currentStepAmount.toString();
     }
-    function loadLevel(_id) {
+    function loadLevelId(_id) {
         if (game.levels.length <= _id) {
             document.getElementById("game-over-overlay").classList.remove("hidden");
             return;
         }
         document.getElementById("lvl-display").innerText = "Level " + (game.currentLevel + 1);
         game.currentLevel = _id;
-        resetPlayCanvas();
         let level = game.levels[_id];
+        loadLevel(level);
+    }
+    game.loadLevelId = loadLevelId;
+    function loadLevel(level) {
+        if (!level)
+            return;
+        resetPlayCanvas();
         game.targetCanvas.reset();
         game.targetCanvas.drawingSteps = level.steps;
+        game.targetCanvas.setScale(level.finalScale);
         game.targetCanvas.drawCurrent();
         const shapeWrapper = document.getElementById("shapes");
         const newShapes = [];
@@ -524,6 +601,7 @@ var game;
     function resetPlayCanvas() {
         game.playCanvas.reset();
         currentScaleLevel = 0;
+        game.currentStepAmount = 0;
         updateScaleUI();
     }
     game.resetPlayCanvas = resetPlayCanvas;
@@ -533,5 +611,10 @@ var game;
     function toggleCutout(_event) {
         cutout = _event.target.checked;
     }
+    function closeGameOver() {
+        var _a;
+        (_a = document.getElementById("game-over-overlay")) === null || _a === void 0 ? void 0 : _a.classList.add("hidden");
+    }
+    game.closeGameOver = closeGameOver;
 })(game || (game = {}));
 //# sourceMappingURL=script.js.map

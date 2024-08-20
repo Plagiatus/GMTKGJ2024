@@ -12,6 +12,7 @@ namespace game {
     const minScale: number = -0.5;
     const scaleStep: number = 0.1;
     let cutout: boolean = false;
+    export let currentStepAmount: number = 0;
 
     playCanvas.canvas.addEventListener("mousemove", mouseOverPlayCanvas);
     playCanvas.canvas.addEventListener("click", mouseClickOnPlayCanvas);
@@ -21,11 +22,13 @@ namespace game {
 
     document.getElementById("start-game")?.addEventListener("click", () => {
         document.getElementById("intro-overlay")!.classList.add("hidden");
-        loadLevel(0);
+        loadLevelId(0);
     });
     document.getElementById("play-reset")?.addEventListener("click", resetPlayCanvas);
     document.getElementById("play-done")?.addEventListener("click", checkCompletion);
 
+    document.getElementById("close-game-over")?.addEventListener("click", closeGameOver);
+    
     document.getElementById("cutout")!.addEventListener("input", <EventListener>toggleCutout);
     document.getElementById("grid")!.addEventListener("input", <EventListener>toggleGrid);
     document.getElementById("grid")!.dispatchEvent(new InputEvent("input"));
@@ -62,22 +65,30 @@ namespace game {
     function mouseClickOnPlayCanvas(_event: MouseEvent) {
         let path = shapes.get(selectedShape)!.path();
         playCanvas.draw(_event.offsetX, _event.offsetY, path, cutout);
+        currentStepAmount++;
+        document.getElementById("current-steps")!.innerText = currentStepAmount.toString();
     }
 
-    export function loadLevel(_id: number) {
+    export function loadLevelId(_id: number){
         if (levels.length <= _id) {
             document.getElementById("game-over-overlay")!.classList.remove("hidden");
             return;
         }
-
+    
         document.getElementById("lvl-display")!.innerText = "Level " + (currentLevel + 1);
         currentLevel = _id;
-        resetPlayCanvas();
-
+        
         let level = levels[_id];
+        loadLevel(level);
+    }
+    
+    export function loadLevel(level: Level) {
+        if(!level) return;
+        resetPlayCanvas();
 
         targetCanvas.reset();
         targetCanvas.drawingSteps = level.steps;
+        targetCanvas.setScale(level.finalScale);
         targetCanvas.drawCurrent();
 
         const shapeWrapper: HTMLElement = document.getElementById("shapes")!;
@@ -133,6 +144,7 @@ namespace game {
     export function resetPlayCanvas() {
         playCanvas.reset();
         currentScaleLevel = 0;
+        currentStepAmount = 0;
         updateScaleUI();
     }
 
@@ -141,5 +153,9 @@ namespace game {
     }
     function toggleCutout(_event: InputEvent) {
         cutout = (<HTMLInputElement>_event.target).checked;
+    }
+
+    export function closeGameOver(){
+        document.getElementById("game-over-overlay")?.classList.add("hidden");
     }
 }

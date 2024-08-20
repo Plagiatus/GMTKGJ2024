@@ -148,6 +148,8 @@ namespace game {
             resultText.classList.remove("red-dot", "yellow-dot");
             resultText.innerText = "Amazing!";
         }
+
+        resultSteps.innerText = currentStepAmount.toString();
         
         resultPercentage.parentElement!.classList.remove("hidden");
         setTimeout(()=>{
@@ -165,7 +167,7 @@ namespace game {
     }
 
     function nextLevel(){
-        loadLevel(currentLevel + 1);
+        loadLevelId(currentLevel + 1);
         overlay.classList.add("hidden");
     }
     
